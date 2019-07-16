@@ -23,6 +23,8 @@
     delete from camera_user
     where customer_id = #{customerId,jdbcType=INTEGER}
   </delete>
+
+
   <insert id="insert" parameterType="com.edu.bupt.wechatpost.model.CameraUser" >
     insert into camera_user (customer_id, appKey, appSecret, 
       accessToken, store)

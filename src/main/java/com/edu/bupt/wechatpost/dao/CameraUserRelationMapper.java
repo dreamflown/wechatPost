@@ -7,7 +7,7 @@ import java.util.List;
 public interface CameraUserRelationMapper {
     int deleteByPrimaryKey(Integer id);
 
-    int deleteByCustomerIdAndCameraId(Integer customerId, String cameraId);
+    int deleteByCustomerIdAndCameraId(String cameraId);
 
     int insert(CameraUserRelation record);
 

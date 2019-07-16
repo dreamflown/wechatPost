@@ -24,13 +24,12 @@ public class CameraController {
 
 
 
-    @RequestMapping(value = "/getTocken", method = RequestMethod.GET)
+    @RequestMapping(value = "/getToken", method = RequestMethod.GET)
     @ResponseBody
-    public JSONObject getTocken(@RequestParam("customerId")Integer id) throws Exception{
+    public JSONObject getToken(@RequestParam("customerId")Integer id) throws Exception{
         JSONObject ret = new JSONObject();
         System.out.println(id);
-        CameraUser user = cameraService.getAccessToken(id);
-        String result = user.getAccesstoken();
+        String result = cameraService.sendForaccessToken(id);
         ret.put("code",result);
         if(result.equals("404")){
             ret.put("msg","用户未注册");
@@ -56,7 +55,7 @@ public class CameraController {
     }
 
     /**
-     * 获取摄像头流地址列表
+     * 获取摄像头流地址列表   cewanle
      * @return
      * @throws Exception
      */
@@ -68,7 +67,7 @@ public class CameraController {
     }
 
     /**
-     * 获取摄像头流地址列表
+     * 获取摄像头流地址列表   cewanle
      * @param serial
      * @return
      * @throws Exception
@@ -77,34 +76,38 @@ public class CameraController {
     @ResponseBody
     public JSONObject getLiveAddressbySerial(@RequestParam("customerId")Integer id,
                                              @RequestParam("serial")String serial) throws Exception{
+
         return cameraService.getLiveAddrBydeviceSerial(id,serial,"1");
     }
 
 
 
     /**
-     * 打开视频流
+     * 打开视频流    ceshiwancheng
      * @param serial
      * @return
      * @throws Exception
      */
     @RequestMapping(value = "/openLive", method = RequestMethod.GET)
     @ResponseBody
-    public JSONArray openLiveByserial(@RequestParam("customerId")Integer id,
-                                      @RequestParam(value = "serial", required = false)String serial) throws Exception{
+    public JSONObject openLiveByserial(@RequestParam("customerId")Integer id,
+                                        @RequestParam("serial") String serial) throws Exception{
+
+        System.out.println(id);
+        System.out.println(serial);
         return cameraService.openLiveBydeviceSerial(id,serial,"1");
 
     }
 
     /**
-     * 关闭视频流
+     * 关闭视频流 ceshiwancheng
      * @param serial
      * @return
      * @throws Exception
      */
     @RequestMapping(value = "/closeLive", method = RequestMethod.GET)
     @ResponseBody
-    public JSONArray closeLiveByserial(@RequestParam("customerId")Integer id,
+    public JSONObject closeLiveByserial(@RequestParam("customerId")Integer id,
                                        @RequestParam(value = "serial")String serial) throws Exception{
 //        JSONObject userInfo = new JSONObject();
 //        userInfo.put("user",user);
@@ -113,6 +116,13 @@ public class CameraController {
 
     }
 
+
+    /**
+     * 获取设备能力 ceshiwancheng
+     * @param serial
+     * @return
+     * @throws Exception
+     */
     @RequestMapping(value = "/getCapacity", method = RequestMethod.GET)
     @ResponseBody
     public JSONObject getDevicecapacitybySerial(@RequestParam("customerId")Integer id,
@@ -123,43 +133,49 @@ public class CameraController {
         return cameraService.getDevicecapacity(id,serial);
     }
 
+
     /**
-     * 获取摄像头列表并排序
-     * @param method
+     * 添加摄像头 ceshitongguo
+     * @param data
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value = "/addDevice", method = RequestMethod.POST)
+    @ResponseBody
+    public JSONObject addDevice(@RequestBody JSONObject data) throws Exception{
+
+        return cameraService.addDevice(data.getInteger("customerId"),data.getString("serial"),
+                                        data.getString("validateCode"),data.getString("name"),
+                                        data.getString("discription"));
+    }
+
+
+    /**
+     * 删除摄像头 ceshitongguo
+     * @param serial
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value = "/delDevice", method = RequestMethod.GET)
+    @ResponseBody
+    public JSONObject delDevice(@RequestParam(value = "customerId",required = true) Integer customerId,
+                                @RequestParam(value = "serial",required = true) String serial) throws Exception{
+        return cameraService.delDevice(customerId,serial);
+    }
+
+
+
+
+    /**
+     * 获取摄像头列表并排序 ceshiwancheng
+     * @param customerId
      * @return
      * @throws Exception
      */
     @RequestMapping(value = "/getDevices", method = RequestMethod.GET)
-    public List<Camera> getDevices(@RequestParam(value = "customerId",required = true) Integer customerId,
-                                   @RequestParam(value = "method",required = false) String method) throws Exception{
+    public JSONObject getDevices(@RequestParam(value = "customerId",required = true) Integer customerId) throws Exception{
 
-        return cameraService.dealGetDevices(customerId, method);
-    }
-
-
-    @RequestMapping(value = "/addDevice", method = RequestMethod.GET)
-    public JSONObject addDevice(@RequestBody JSONObject data) throws Exception{
-//        String user = data.getString("user");
-//        String passwd = data.getString("passwd");
-        String serial = data.getString("serial");
-        String validateCode = data.getString("validateCode");
-        Integer customerId = data.getInteger("customerId");
-        String name = data.getString("name");
-        String group = data.getString("group");
-        String manufature = data.getString("manufacturer");
-        String model = data.getString("model");
-        String version = data.getString("version");
-        String discription = data.getString("description");
-        Timestamp lastOnline =new Timestamp(System.currentTimeMillis());
-        String state = "online";
-
-        Camera camera = new Camera(serial, name, lastOnline.toString(), state, version, model, manufature, group, discription);
-
-//        JSONObject userInfo = new JSONObject();
-//        userInfo.put("user",user);
-//        userInfo.put("passwd",passwd);
-        return cameraService.addDevice(customerId,serial,validateCode, camera);
-
+        return cameraService.dealGetDevices(customerId);
     }
 
 
@@ -175,48 +191,42 @@ public class CameraController {
 //        return cameraService.addDevice(userInfo,serial,validateCode);
 //    }
 
-    @RequestMapping(value = "/delDevice", method = RequestMethod.DELETE)
-    @ResponseBody
-    public JSONObject delDevice(@RequestParam(value = "customerId",required = true) Integer customerId,
-                                @RequestParam(value = "cameraId",required = true) String cameraId,
-                                @RequestParam(value = "serial",required = true) String serial) throws Exception{
-//        JSONObject userInfo = new JSONObject();
-//        userInfo.put("user",user);
-//        userInfo.put("passwd",passwd);
-        return cameraService.delDevice(customerId,serial, cameraId);
-    }
+
 
 
     /**
-     * 修改摄像头信息
-     * @param data
+     * 修改摄像头信息 cewanle
+     * @param body
      * @return
      * @throws Exception
      */
     @RequestMapping(value = "/updateDeviceInfo", method = RequestMethod.POST)
-    public JSONObject updateDeviceInfo(@RequestBody JSONObject data) throws Exception{
+    public JSONObject updateDeviceInfo(@RequestBody JSONObject body) throws Exception{
 
-//        String user = data.getString("user");
-//        String passwd = data.getString("passwd");
-        String serial = data.getString("serial");
-        String validateCode = data.getString("validateCode");
-        Integer customerId = data.getInteger("customerId");
-        String name = data.getString("name");
-        String group = data.getString("group");
-        String manufature = data.getString("manufacturer");
-        String model = data.getString("model");
-        String version = data.getString("version");
-        String discription = data.getString("description");
-        String state = data.getString("state");
-        Timestamp lastOnline =new Timestamp(System.currentTimeMillis());
+        return cameraService.updateDeviceInfo(body);
+    }
 
-//        JSONObject userInfo = new JSONObject();
-//        userInfo.put("user",user);
-//        userInfo.put("passwd",passwd);
+    /**
+     * 用户注册 cewanle
+     * @param data
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value = "/register", method = RequestMethod.POST)
+    public JSONObject register(@RequestBody JSONObject data){
 
-        Camera camera = new Camera(serial, name, lastOnline.toString(), state, version, model, manufature, group, discription);
-        // TODO
-        return cameraService.updateDeviceInfo(camera);
+        System.out.println(data.toJSONString());
+
+        CameraUser user = new CameraUser();
+
+        user.setCustomerId(data.getInteger("customerId"));
+        user.setAppkey(data.getString("appKey"));
+        user.setAppsecret(data.getString("appSecret"));
+
+        JSONObject ret = new JSONObject();
+        ret.put("msg",cameraService.register(user));
+        ret.put("code","200");
+        return ret;
     }
 
     /**
