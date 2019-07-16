@@ -216,16 +216,13 @@ public class CameraController {
     public JSONObject register(@RequestBody JSONObject data){
 
         System.out.println(data.toJSONString());
-
-        CameraUser user = new CameraUser();
-
-        user.setCustomerId(data.getInteger("customerId"));
-        user.setAppkey(data.getString("appKey"));
-        user.setAppsecret(data.getString("appSecret"));
-
         JSONObject ret = new JSONObject();
-        ret.put("msg",cameraService.register(user));
+        String res = cameraService.register(data);
+        ret.put("msg",res);
         ret.put("code","200");
+        if(res.equals("fail")){
+            ret.put("code","403");
+        }
         return ret;
     }
 

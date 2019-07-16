@@ -45,22 +45,24 @@ public class CameraServiceImpl implements CameraService {
     }
 
     //chewangle
-    public String register(CameraUser user){
+    public String register(JSONObject userJson){
         String resp = "succeed";
-        int insert = userMapper.insertSelective(user);
-        if (insert != 0) {
-            String accessToken = sendForaccessToken(user.getCustomerId());
-            if (accessToken.equals("404") || accessToken.equals("500")) {
-                userMapper.deleteByPrimaryKey(user.getCustomerId());
-            } else {
-                user.setAccesstoken(accessToken);
-                insert = userMapper.updateByPrimaryKeySelective(user);
-                if(insert == 0){
-                    resp = "fail";
-                }
-            }
-        }else{
+        int insert;
+        CameraUser user = new CameraUser();
+        user.setCustomerId(userJson.getInteger("customerId"));
+        user.setAppkey(userJson.getString("appkey"));
+        user.setAppsecret(userJson.getString("appSecret"));
+        String accessToken = sendForaccessToken(userJson.getInteger("customerId"),userJson.getString("appkey"),
+                                                userJson.getString("appSecret"));
+
+        if (accessToken.equals("404") || accessToken.equals("500")) {
             resp = "fail";
+        } else {
+            user.setAccesstoken(accessToken);
+            insert = userMapper.insertSelective(user);
+            if(insert == 0){
+                resp = "fail";
+           }
         }
         return resp;
     }
@@ -118,12 +120,45 @@ public class CameraServiceImpl implements CameraService {
     }
 
 
+    public String sendForaccessToken(Integer customerId,String appKey,String appSecret) {
+        String postUrl = "https://open.ys7.com/api/lapp/token/get";
+        String result = new String();
+        if(null == customerId){
+            result = "404";
+        }else {
+            okhttp3.RequestBody body = new FormBody.Builder()
+                    .add("appKey", appKey)
+                    .add("appSecret", appSecret).build();
+            Request request = new Request.Builder()
+                    .url(postUrl)
+                    .post(body)
+                    .build();
+            try {
+                Response response = client.newCall(request).execute();
+                if (response.isSuccessful()) {
+                    result = response.body().string();
+                    JSONObject resultJson = JSONObject.parseObject(result);
+                    if (true == resultJson.getString("code").equals("200")) {
+                        result = resultJson.getJSONObject("data").getString("accessToken");
+                    } else {
+                        result = "500";
+                    }
+                } else {
+                    result = "500";
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+                result = "500";
+            }
+        }
+        return result;
+    }
+
+
     public String sendForaccessToken(Integer customerId) {
         String postUrl = "https://open.ys7.com/api/lapp/token/get";
         String result = new String();
         CameraUser user = userMapper.selectByPrimaryKey(customerId);
-        //(user.getAppkey());
-        //(user.getAppsecret());
         if(null == user){
             result = "404";
         }else {
@@ -142,6 +177,7 @@ public class CameraServiceImpl implements CameraService {
                     if (true == resultJson.getString("code").equals("200")) {
                         result = resultJson.getJSONObject("data").getString("accessToken");
                         user.setAccesstoken(result);
+                        userMapper.updateByPrimaryKeySelective(user);
                     } else {
                         result = "500";
                     }
@@ -358,8 +394,6 @@ public class CameraServiceImpl implements CameraService {
                 .build();
 
         String response = this.POST(request);
-        System.out.println(response);
-        
         if(null != response){
             // add device into database
             String id = serial;
@@ -371,26 +405,33 @@ public class CameraServiceImpl implements CameraService {
             }
             setDeviceName(customerId,camera.getSerial(),camera.getName());
             camera.setDiscription(discription);
+            JSONObject cameraJson = new JSONObject();
 
-            for (int i =0; i<3; i++) {
-                int add = dealAddDevice(customerId, camera);
-                if (add != 0) {
-                    ret.put("msg", "success");
-                    ret.put("code","200");
-                    JSONObject cameraJson = new JSONObject();
-                    cameraJson.put("cameraId",camera.getId());
-                    cameraJson.put("deviceSerial",camera.getSerial());
-                    ret.put("data",cameraJson);
-                    break;
-                } else {
-                    ret.put("code","500");
-                    ret.put("msg", "fail");
-                    continue;
-                }
-            }
+            cameraJson.put("cameraId",camera.getId());
+            cameraJson.put("deviceSerial",camera.getSerial());
+            ret.put("data",cameraJson);
+            ret.put("msg", "success");
+            ret.put("code","200");
+//
+//            for (int i =0; i<3; i++) {
+//                int add = dealAddDevice(customerId, camera);
+//                if (add != 0) {
+//                    ret.put("msg", "success");
+//                    ret.put("code","200");
+//                    JSONObject cameraJson = new JSONObject();
+//                    cameraJson.put("cameraId",camera.getId());
+//                    cameraJson.put("deviceSerial",camera.getSerial());
+//                    ret.put("data",cameraJson);
+//                    break;
+//                } else {
+//                    ret.put("code","500");
+//                    ret.put("msg", "fail");
+//                    continue;
+//                }
+//            }
         }else{
             ret.put("code","500");
-            ret.put("msg","内部错误");
+            ret.put("msg","该设备已经添加");
         }
         return ret;
     }
@@ -422,21 +463,22 @@ public class CameraServiceImpl implements CameraService {
         System.out.println(response);
         if(null != response){
             ret.put("data",JSONObject.parseObject(response));
-            for (int i = 0; i<3; i++) {
-                int delete = dealDeleteDevice(customerId,deviceSerial);
-                if (delete != 0) {
-                    ret.put("sql", "success");
-                    ret.put("code","200");
-                    break;
-                } else {
-                    ret.put("code","500");
-                    ret.put("sql", "fail");
-                    continue;
-                }
-            }
+            ret.put("code","200");
+//            for (int i = 0; i<3; i++) {
+//                int delete = dealDeleteDevice(customerId,deviceSerial);
+//                if (delete != 0) {
+//                    ret.put("sql", "success");
+//                    ret.put("code","200");
+//                    break;
+//                } else {
+//                    ret.put("code","500");
+//                    ret.put("sql", "fail");
+//                    continue;
+//                }
+//            }
         }else{
             ret.put("code","500");
-            ret.put("data","内部错误");
+            ret.put("data",JSONObject.parseObject(response));
         }
         return ret;
     }

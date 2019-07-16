@@ -12,7 +12,8 @@ public interface CameraService {
     CameraUser getAccessToken(Integer customerId);
     String updateUserInfo(CameraUser user);
     String sendForaccessToken(Integer customerId);
-    String register(CameraUser user);
+    String sendForaccessToken(Integer customerId,String appKey,String appSecret);
+    String register(JSONObject userJson);
     JSONObject getLiveAddressList(Integer customer_id);
     JSONObject getLiveAddrBydeviceSerial(Integer customer_id,String deviceSerial,String cam);
     JSONObject openLiveBydeviceSerial(Integer customer_id,String deviceSerial,String Cam);
