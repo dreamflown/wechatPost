@@ -15,6 +15,11 @@
 *.iws
 *.iml
 *.ipr
+*.yml
+generatorConfig.properties
+generatorConfig.xml
+server.p12
+
 
 ### NetBeans ###
 /nbproject/private/
