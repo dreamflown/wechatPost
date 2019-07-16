@@ -90,7 +90,7 @@ public class CameraServiceImpl implements CameraService {
     }
 
 
-    public CameraUser getAccessTocken(Integer customerId){
+    public CameraUser getaccessToken(Integer customerId){
         CameraUser user = null;
         user = userMapper.selectByPrimaryKey(customerId);
         return user;
@@ -106,7 +106,7 @@ public class CameraServiceImpl implements CameraService {
         return yet < 1563856469974L;
     }
 
-    public String sendForAccessTocken(Integer customerId) {
+    public String sendForaccessToken(Integer customerId) {
         String postUrl = "https://open.ys7.com/api/lapp/token/get";
         String result = new String();
         CameraUser user = userMapper.selectByPrimaryKey(customerId);
@@ -145,11 +145,19 @@ public class CameraServiceImpl implements CameraService {
     }
 
     public JSONObject getLiveAddressList(Integer customerId){
+
         String postUrl = "https://open.ys7.com/api/lapp/live/video/list";
         JSONObject ret = new JSONObject();
-        String accessTocken = getAccessTocken(customerId);
-        System.out.println(accessTocken);
-
+        CameraUser user = getaccessToken(customerId);
+        String accessToken = new String();
+        if (user == null) {
+            return ret;
+        }
+        if (!validAccessToken(user)) {
+            accessToken = sendForaccessToken(customerId);
+        } else {
+            accessToken = user.getAccesstoken();
+        }
         okhttp3.RequestBody body = new FormBody.Builder()
                 .add("accessToken", accessToken).build();
         Request request = new Request.Builder()
@@ -174,10 +182,19 @@ public class CameraServiceImpl implements CameraService {
         String postUrl = "https://open.ys7.com/api/lapp/live/address/get";
         JSONObject ret = new JSONObject();
 
-        String accessTocken = getAccessTocken(customerId);
+                CameraUser user = getaccessToken(customerId);
+        String accessToken = new String();
+        if (user == null) {
+            return ret;
+        }
+        if (!validAccessToken(user)) {
+            accessToken = sendForaccessToken(customerId);
+        } else {
+            accessToken = user.getAccesstoken();
+        }
 
         okhttp3.RequestBody body = new FormBody.Builder()
-                .add("accessToken", accessTocken)
+                .add("accessToken", accessToken)
                 .add("source",deviceSerial+":"+Cam).build();
         Request request = new Request.Builder()
                 .url(postUrl)
@@ -187,7 +204,7 @@ public class CameraServiceImpl implements CameraService {
         String response = this.POST(request);
         if(null != response){
             System.out.println(response);
-            ret = JSONObject.parseObject(response).getJSONArray("data");
+            ret.put("data",JSONObject.parseObject(response).getJSONArray("data"));
         }else{
             System.out.println("post error");
             ret = null;
@@ -199,9 +216,18 @@ public class CameraServiceImpl implements CameraService {
         String postUrl = "https://open.ys7.com/api/lapp/live/video/open";
         JSONObject appInfo = getAppInfoByuserInfo(customerId);
         JSONArray ret = new JSONArray();
-        String accessTocken = getAccessTocken(customerId);
+                CameraUser user = getaccessToken(customerId);
+        String accessToken = new String();
+        if (user == null) {
+            return ret;
+        }
+        if (!validAccessToken(user)) {
+            accessToken = sendForaccessToken(customerId);
+        } else {
+            accessToken = user.getAccesstoken();
+        }
         okhttp3.RequestBody body = new FormBody.Builder()
-                .add("accessToken", accessTocken)
+                .add("accessToken", accessToken)
                 .add("source",deviceSerial+":"+Cam).build();
         Request request = new Request.Builder()
                 .url(postUrl)
@@ -222,9 +248,18 @@ public class CameraServiceImpl implements CameraService {
         String postUrl = "https://open.ys7.com/api/lapp/live/video/close";
         JSONObject appInfo = getAppInfoByuserInfo(customerId);
         JSONArray ret = new JSONArray();
-        String accessTocken = getAccessTocken(customerId);
+                CameraUser user = getaccessToken(customerId);
+        String accessToken = new String();
+        if (user == null) {
+            return ret;
+        }
+        if (!validAccessToken(user)) {
+            accessToken = sendForaccessToken(customerId);
+        } else {
+            accessToken = user.getAccesstoken();
+        }
         okhttp3.RequestBody body = new FormBody.Builder()
-                .add("accessToken", accessTocken)
+                .add("accessToken", accessToken)
                 .add("source",deviceSerial+":"+Cam).build();
         Request request = new Request.Builder()
                 .url(postUrl)
@@ -245,9 +280,18 @@ public class CameraServiceImpl implements CameraService {
         String postUrl = "https://open.ys7.com/api/lapp/device/capacity";
         JSONObject appInfo = getAppInfoByuserInfo(customerId);
         JSONObject ret = new JSONObject();
-        String accessTocken = getAccessTocken(customerId);
+                CameraUser user = getaccessToken(customerId);
+        String accessToken = new String();
+        if (user == null) {
+            return ret;
+        }
+        if (!validAccessToken(user)) {
+            accessToken = sendForaccessToken(customerId);
+        } else {
+            accessToken = user.getAccesstoken();
+        }
         okhttp3.RequestBody body = new FormBody.Builder()
-                .add("accessToken", accessTocken)
+                .add("accessToken", accessToken)
                 .add("deviceSerial",deviceSerial).build();
         Request request = new Request.Builder()
                 .url(postUrl)
@@ -268,9 +312,18 @@ public class CameraServiceImpl implements CameraService {
         String postUrl = "https://open.ys7.com/api/lapp/device/add";
         JSONObject appInfo = getAppInfoByuserInfo(customerId);
         JSONObject ret = new JSONObject();
-        String accessTocken = getAccessTocken(customerId);
+                CameraUser user = getaccessToken(customerId);
+        String accessToken = new String();
+        if (user == null) {
+            return ret;
+        }
+        if (!validAccessToken(user)) {
+            accessToken = sendForaccessToken(customerId);
+        } else {
+            accessToken = user.getAccesstoken();
+        }
         okhttp3.RequestBody body = new FormBody.Builder()
-                .add("accessToken", accessTocken)
+                .add("accessToken", accessToken)
                 .add("deviceSerial",serial)
                 .add("validateCode",validateCode).build();
         Request request = new Request.Builder()
@@ -308,9 +361,18 @@ public class CameraServiceImpl implements CameraService {
         String postUrl = "https://open.ys7.com/api/lapp/device/delete";
 //        JSONObject appInfo = getAppInfoByuserInfo(customerId);
         JSONObject ret = new JSONObject();
-        String accessTocken = getAccessTocken(customerId);
+        CameraUser user = getaccessToken(customerId);
+        String accessToken = new String();
+        if (user == null) {
+            return ret;
+        }
+        if (!validAccessToken(user)) {
+            accessToken = sendForaccessToken(customerId);
+        } else {
+            accessToken = user.getAccesstoken();
+        }
         okhttp3.RequestBody body = new FormBody.Builder()
-                .add("accessToken", accessTocken)
+                .add("accessToken", accessToken)
                 .add("deviceSerial",deviceSerial).build();
         Request request = new Request.Builder()
                 .url(postUrl)

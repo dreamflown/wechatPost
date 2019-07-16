@@ -2,6 +2,7 @@ package com.edu.bupt.wechatpost.controller;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.edu.bupt.wechatpost.model.CameraUser;
 import com.edu.bupt.wechatpost.service.CameraService;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
@@ -28,7 +29,8 @@ public class CameraController {
     public JSONObject getTocken(@RequestParam("customerId")Integer id) throws Exception{
         JSONObject ret = new JSONObject();
         System.out.println(id);
-        String result =  cameraService.getAccessTocken(id);
+        CameraUser user = cameraService.getAccessTocken(id);
+        String result = user.getAccesstoken();
         ret.put("code",result);
         if(result.equals("404")){
             ret.put("msg","用户未注册");
@@ -55,7 +57,6 @@ public class CameraController {
 
     /**
      * 获取摄像头流地址列表
-     * @param serial
      * @return
      * @throws Exception
      */

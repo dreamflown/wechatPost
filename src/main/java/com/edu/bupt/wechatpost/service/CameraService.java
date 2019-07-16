@@ -9,8 +9,9 @@ import java.util.List;
 
 public interface CameraService {
     boolean validAccessToken(CameraUser user);
+    CameraUser getaccessToken(Integer customerId);
     String updateUserInfo(CameraUser user);
-    String sendForAccessTocken(Integer customer_id);
+    String sendForaccessToken(Integer customerId);
     String register(String appKey, String appSecret);
     JSONObject getLiveAddressList(Integer customer_id);
     JSONObject getLiveAddrBydeviceSerial(Integer customer_id,String deviceSerial,String cam);
