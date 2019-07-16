@@ -68,9 +68,6 @@ public class CameraController {
     @ResponseBody
     public JSONArray openLiveByserial(@RequestParam("customerId")Integer id,
                                       @RequestParam(value = "serial", required = false)String serial) throws Exception{
-//        JSONObject userInfo = new JSONObject();
-//        userInfo.put("user",user);
-//        userInfo.put("passwd",passwd);
         return cameraService.openLiveBydeviceSerial(id,serial,"1");
 
     }
