@@ -21,18 +21,24 @@ public class CameraController {
     private CameraService cameraService;
 
 
-//    @ApiOperation(value = "getAccessTocken",notes = "get the tocken forme ys7")
-//    @ApiImplicitParam(name = "appInfo", value = "the username and passwd info", required = true, dataType = "JSONObject")
-    @RequestMapping(value = "/getTocken", method = RequestMethod.GET)
-    public String getTocken(@RequestParam("customerId")Integer id) throws Exception{
-        return cameraService.getAccessTocken(id);
-    }
 
-    @RequestMapping(value = "/register", method = RequestMethod.POST)
-    public String getTocken(@RequestBody JSONObject appInfo) throws Exception{
-        String appKey = appInfo.getString("appKey");
-        String appSecret = appInfo.getString("appSecret");
-        return cameraService.register(appKey, appSecret);
+
+    @RequestMapping(value = "/getTocken", method = RequestMethod.GET)
+    @ResponseBody
+    public JSONObject getTocken(@RequestParam("customerId")Integer id) throws Exception{
+        JSONObject ret = new JSONObject();
+        System.out.println(id);
+        String result =  cameraService.getAccessTocken(id);
+        ret.put("code",result);
+        if(result.equals("404")){
+            ret.put("msg","用户未注册");
+        }else if(result.equals("500")){
+            ret.put("msh","内部错误");
+        }else{
+            ret.put("code","200");
+            ret.put("msg",result);
+        }
+        return ret;
     }
 
     /**
@@ -46,25 +52,11 @@ public class CameraController {
     public JSONArray getLiveAddressList(@RequestParam("customerId")Integer id,
                                         @RequestParam(value = "serial", required = false)String serial) throws Exception{
 
-//        JSONObject userInfo = new JSONObject();
-//        userInfo.put("user",user);
-//        userInfo.put("passwd",passwd);
         if(!serial.equals("")) {
             return cameraService.getLiveAddrBydeviceSerial(id,serial,"1");
         }
         return cameraService.getLiveAddressList(id);
     }
-
-//    @RequestMapping(value = "/getLiveAddress/serial", method = RequestMethod.GET)
-//    @ResponseBody
-//    public JSONArray getLiveAddrByDeviceSerial(@RequestParam(value = "user",required =  true) String user,
-//                                                     @RequestParam(value="passwd",required = true) String passwd,
-//                                                     @RequestParam(value = "serial",required = true)String serial) throws Exception{
-//        JSONObject userInfo = new JSONObject();
-//        userInfo.put("user",user);
-//        userInfo.put("passwd",passwd);
-//        return cameraService.getLiveAddrByserial(userInfo,serial,"1");
-//    }
 
     /**
      * 打开视频流

@@ -5,9 +5,9 @@ server:
 spring:
     datasource:
 #        url: jdbc:mysql://118.190.202.148:3306/BUPT_IOT?characterEncoding=UTF-8
-        url: jdbc:mysql://localhost:3306/BUPT_IOT?useUnicode=true&characterEncoding=UTF-8
+        url: jdbc:mysql://localhost:3306/camera?useUnicode=true&characterEncoding=UTF-8
         username: root
-        password: admin123
+        password: eagle520
         driver-class-name: com.mysql.jdbc.Driver
 
 mybatis:

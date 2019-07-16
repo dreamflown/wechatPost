@@ -91,38 +91,38 @@ public class CameraServiceImpl implements CameraService {
     public String getAccessTocken(Integer customerId) {
         String postUrl = "https://open.ys7.com/api/lapp/token/get";
         String result = new String();
+//        JSONObject appInfo = getAppInfoByuserInfo(customerId);
+
+
         CameraUser user = userMapper.selectByPrimaryKey(customerId);
-        okhttp3.RequestBody body = new FormBody.Builder()
-                .add("appKey", user.getAppkey())
-                .add("appSecret", user.getAppsecret()).build();
-        Request request = new Request.Builder()
-                .url(postUrl)
-                .post(body)
-                .build();
-        try {
-            Response response = client.newCall(request).execute();
-            if (response.isSuccessful()) {
-                result = response.body().string();
-                JSONObject resultJson = JSONObject.parseObject(result);
-                if (true == resultJson.getString("code").equals("200")) {
-                    Long expireTime = resultJson.getJSONObject("data").getLong("expireTime");
-                    result = resultJson.getJSONObject("data").getString("accessToken");
-                    user.setAccesstoken(result);
-                    for (int i =0; i<3; i++){
-                        int update = userMapper.updateByPrimaryKeySelective(user);
-                        if (update != 0){
-                            System.out.println("insert accesstoken succeed");
-                            break;
-                        }
+        if(null == user){
+            result = "404";
+        }else {
+            okhttp3.RequestBody body = new FormBody.Builder()
+                    .add("appKey", user.getAppkey())
+                    .add("appSecret", user.getAppsecret()).build();
+            Request request = new Request.Builder()
+                    .url(postUrl)
+                    .post(body)
+                    .build();
+            try {
+                Response response = client.newCall(request).execute();
+                if (response.isSuccessful()) {
+                    result = response.body().string();
+                    JSONObject resultJson = JSONObject.parseObject(result);
+                    if (true == resultJson.getString("code").equals("200")) {
+                        result = resultJson.getJSONObject("data").getString("accessToken");
+                        user.setAccesstoken(result);
+                    } else {
+                        result = "500";
                     }
                 } else {
-                    result = null;
+                    result = "500";
                 }
-            } else {
-                result = null;
+            } catch (IOException e) {
+                e.printStackTrace();
+                result = "500";
             }
-        } catch (IOException e) {
-            e.printStackTrace();
         }
         return result;
     }
@@ -132,13 +132,17 @@ public class CameraServiceImpl implements CameraService {
         JSONObject appInfo = getAppInfoByuserInfo(customerId);
         JSONArray ret = new JSONArray();
         CameraUser user  = userMapper.selectByPrimaryKey(customerId);
+
         String accessTocken = getAccessTocken(customerId);
+
         okhttp3.RequestBody body = new FormBody.Builder()
                 .add("accessToken", accessTocken).build();
         Request request = new Request.Builder()
                 .url(postUrl)
                 .post(body)
                 .build();
+
+
         try{
             Response response = client.newCall(request).execute();
             if(response.isSuccessful()){
