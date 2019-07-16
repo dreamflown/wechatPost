@@ -41,6 +41,18 @@ public class CameraController {
         return ret;
     }
 
+    @RequestMapping(value = "/user/update", method = RequestMethod.POST)
+    public String updateUserInfo(@RequestBody JSONObject appInfo) throws Exception{
+        Integer customerId = appInfo.getInteger("customerId");
+        String appKey = appInfo.getString("appKey");
+        String appSecret = appInfo.getString("appSecret");
+        CameraUser user = new CameraUser();
+        user.setCustomerId(customerId);
+        user.setAppkey(appKey);
+        user.setAppsecret(appSecret);
+        return cameraService.updateUserInfo(user);
+    }
+
     /**
      * 获取摄像头流地址列表
      * @param serial
@@ -49,14 +61,25 @@ public class CameraController {
      */
     @RequestMapping(value = "/getLiveAddress", method = RequestMethod.GET)
     @ResponseBody
-    public JSONArray getLiveAddressList(@RequestParam("customerId")Integer id,
-                                        @RequestParam(value = "serial", required = false)String serial) throws Exception{
+    public JSONObject getLiveAddressList(@RequestParam("customerId")Integer id) throws Exception{
 
-        if(!serial.equals("")) {
-            return cameraService.getLiveAddrBydeviceSerial(id,serial,"1");
-        }
         return cameraService.getLiveAddressList(id);
     }
+
+    /**
+     * 获取摄像头流地址列表
+     * @param serial
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value = "/getLiveAddressbySerial", method = RequestMethod.GET)
+    @ResponseBody
+    public JSONObject getLiveAddressbySerial(@RequestParam("customerId")Integer id,
+                                             @RequestParam("serial")String serial) throws Exception{
+        return cameraService.getLiveAddrBydeviceSerial(id,serial,"1");
+    }
+
+
 
     /**
      * 打开视频流
@@ -81,7 +104,7 @@ public class CameraController {
     @RequestMapping(value = "/closeLive", method = RequestMethod.GET)
     @ResponseBody
     public JSONArray closeLiveByserial(@RequestParam("customerId")Integer id,
-                                       @RequestParam(value = "serial", required = false)String serial) throws Exception{
+                                       @RequestParam(value = "serial")String serial) throws Exception{
 //        JSONObject userInfo = new JSONObject();
 //        userInfo.put("user",user);
 //        userInfo.put("passwd",passwd);

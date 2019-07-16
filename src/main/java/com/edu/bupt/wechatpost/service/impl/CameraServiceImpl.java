@@ -11,18 +11,18 @@ import com.edu.bupt.wechatpost.model.CameraUserRelation;
 import com.edu.bupt.wechatpost.service.CameraService;
 import okhttp3.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 
 import java.io.IOException;
+import java.text.ParsePosition;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
 public class CameraServiceImpl implements CameraService {
 
-    private String accessTocken = new String();
     private JSONObject appInfo = new JSONObject();
     private static OkHttpClient client = new OkHttpClient();
 
@@ -34,12 +34,6 @@ public class CameraServiceImpl implements CameraService {
 
     @Autowired
     private CameraUserRelationMapper relationMapper;
-
-    @Scheduled
-    private void getAndUpdateToken(){
-        //todo
-        this.accessTocken = "";
-    }
 
 
     private JSONObject  getAppInfoByuserInfo(Integer customerId){
@@ -60,6 +54,14 @@ public class CameraServiceImpl implements CameraService {
             resp = "fail";
         }
         return resp;
+    }
+
+    public String updateUserInfo(CameraUser user){
+        int update = userMapper.updateByPrimaryKeySelective(user);
+        if (update == 0){
+            return "false";
+        }
+        return "succeed";
     }
 
     private String POST(Request request){
@@ -88,13 +90,28 @@ public class CameraServiceImpl implements CameraService {
     }
 
 
-    public String getAccessTocken(Integer customerId) {
+    public CameraUser getAccessTocken(Integer customerId){
+        CameraUser user = null;
+        user = userMapper.selectByPrimaryKey(customerId);
+        return user;
+    }
+
+    public boolean validAccessToken(CameraUser user) {
+        String timestamp = user.getStore();
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+        ParsePosition pos = new ParsePosition(0);
+        Date last = format.parse(timestamp,pos);
+        Date now = new Date();
+        long yet = now.getTime() - last.getTime()/ 1000L; // 距离上一次更新过了多少秒
+        return yet < 1563856469974L;
+    }
+
+    public String sendForAccessTocken(Integer customerId) {
         String postUrl = "https://open.ys7.com/api/lapp/token/get";
         String result = new String();
-//        JSONObject appInfo = getAppInfoByuserInfo(customerId);
-
-
         CameraUser user = userMapper.selectByPrimaryKey(customerId);
+        System.out.println(user.getAppkey());
+        System.out.println(user.getAppsecret());
         if(null == user){
             result = "404";
         }else {
@@ -127,52 +144,38 @@ public class CameraServiceImpl implements CameraService {
         return result;
     }
 
-    public JSONArray getLiveAddressList(Integer customerId){
+    public JSONObject getLiveAddressList(Integer customerId){
         String postUrl = "https://open.ys7.com/api/lapp/live/video/list";
-        JSONObject appInfo = getAppInfoByuserInfo(customerId);
-        JSONArray ret = new JSONArray();
-        CameraUser user  = userMapper.selectByPrimaryKey(customerId);
-
+        JSONObject ret = new JSONObject();
         String accessTocken = getAccessTocken(customerId);
+        System.out.println(accessTocken);
 
         okhttp3.RequestBody body = new FormBody.Builder()
-                .add("accessToken", accessTocken).build();
+                .add("accessToken", accessToken).build();
         Request request = new Request.Builder()
                 .url(postUrl)
                 .post(body)
                 .build();
-
-
-        try{
-            Response response = client.newCall(request).execute();
-            if(response.isSuccessful()){
-                String result = response.body().string();
-                JSONObject resultJson = JSONObject.parseObject(result);
-                if(resultJson.getString("code").equals("200")){
-                    ret = resultJson.getJSONArray("data");
-                }else if(resultJson.getString("code").equals("10002")){
-
-                }else{
-                    System.out.println("code error"+resultJson.getString("code"));
-                    ret = null;
-                }
-            }else{
-                System.out.println("request failed");
-                ret = null;
-            }
-        }catch (IOException e){
-            System.out.println("post error");
-            ret = null;
+        String result  = this.POST(request);
+        System.out.println(result);
+        if(null != result){
+            JSONObject resultJson = JSONObject.parseObject(result);
+            ret.put("data",resultJson.getJSONArray("data"));
+            ret.put("code","200");
+        }else{
+            ret.put("code","500");
+            ret.put("data","内部错误");
         }
         return ret;
     }
 
-    public JSONArray getLiveAddrBydeviceSerial(Integer customerId, String deviceSerial,String Cam){
+    public JSONObject getLiveAddrBydeviceSerial(Integer customerId, String deviceSerial,String Cam){
 
         String postUrl = "https://open.ys7.com/api/lapp/live/address/get";
-        JSONObject appInfo = getAppInfoByuserInfo(customerId);
-        JSONArray ret = new JSONArray();
+        JSONObject ret = new JSONObject();
+
         String accessTocken = getAccessTocken(customerId);
+
         okhttp3.RequestBody body = new FormBody.Builder()
                 .add("accessToken", accessTocken)
                 .add("source",deviceSerial+":"+Cam).build();
