@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.edu.bupt.wechatpost.dao.AuthMapper">
+    <select id = "selectOAByUnionid" parameterType="java.lang.String" resultType="java.lang.String">
+        SELECT oa_openid
+        FROM auth
+        WHERE unionid = #{unionid, jdbcType = VARCHAR}
+    </select>
+
+    <select id = "selectByUnionid" parameterType="java.lang.String" resultMap="authMap">
+        SELECT *
+        FROM auth
+        WHERE unionid = #{unionid, jdbcType = VARCHAR}
+    </select>
+    <resultMap id = "authMap" type="Auth" autoMapping="true">
+        <id property="unionid" column="unionid" javaType="java.lang.String"/>
+        <result property="mini_openid" column="mini_openid" javaType="java.lang.String"/>
+        <result property="oa_openid" column="oa_openid" javaType="java.lang.String"/>
+    </resultMap>
+
+    <insert id="insertSelective" parameterType="Auth">
+        INSERT INTO auth
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="unionid != null">
+                unionid,
+            </if>
+            <if test="mini_openid != null">
+                mini_openid,
+            </if>
+            <if test="oa_openid != null">
+                oa_openid,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="unionid != null">
+                #{unionid,jdbcType=VARCHAR},
+            </if>
+            <if test="mini_openid != null">
+                #{mini_openid,jdbcType=VARCHAR},
+            </if>
+            <if test="oa_openid != null">
+                #{oa_openid,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+
+    <delete id="deleteByUnionid" parameterType="java.lang.String">
+        DELETE FROM auth WHERE unionid = #{unionid, jdbcType=VARCHAR}
+    </delete>
+
+    <update id="updateMiniOpenid" parameterType="java.lang.String">
+        UPDATE auth SET mini_openid = #{mini_openid,jdbcType=VARCHAR}
+        WHERE unionid = #{unionid,jdbcType=VARCHAR}
+    </update>
+</mapper>

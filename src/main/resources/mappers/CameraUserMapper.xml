@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.edu.bupt.wechatpost.dao.CameraUserMapper" >
+  <resultMap id="BaseResultMap" type="com.edu.bupt.wechatpost.model.CameraUser" >
+    <constructor >
+      <idArg column="customer_id" jdbcType="INTEGER" javaType="java.lang.Integer" />
+      <arg column="appKey" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <arg column="appSecret" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <arg column="accessToken" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <arg column="store" jdbcType="VARCHAR" javaType="java.lang.String" />
+    </constructor>
+  </resultMap>
+  <sql id="Base_Column_List" >
+    customer_id, appKey, appSecret, accessToken, store
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from camera_user
+    where customer_id = #{customerId,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from camera_user
+    where customer_id = #{customerId,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.edu.bupt.wechatpost.model.CameraUser" >
+    insert into camera_user (customer_id, appKey, appSecret, 
+      accessToken, store)
+    values (#{customerId,jdbcType=INTEGER}, #{appkey,jdbcType=VARCHAR}, #{appsecret,jdbcType=VARCHAR}, 
+      #{accesstoken,jdbcType=VARCHAR}, #{store,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.edu.bupt.wechatpost.model.CameraUser" >
+    insert into camera_user
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="customerId != null" >
+        customer_id,
+      </if>
+      <if test="appkey != null" >
+        appKey,
+      </if>
+      <if test="appsecret != null" >
+        appSecret,
+      </if>
+      <if test="accesstoken != null" >
+        accessToken,
+      </if>
+      <if test="store != null" >
+        store,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="customerId != null" >
+        #{customerId,jdbcType=INTEGER},
+      </if>
+      <if test="appkey != null" >
+        #{appkey,jdbcType=VARCHAR},
+      </if>
+      <if test="appsecret != null" >
+        #{appsecret,jdbcType=VARCHAR},
+      </if>
+      <if test="accesstoken != null" >
+        #{accesstoken,jdbcType=VARCHAR},
+      </if>
+      <if test="store != null" >
+        #{store,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.edu.bupt.wechatpost.model.CameraUser" >
+    update camera_user
+    <set >
+      <if test="appkey != null" >
+        appKey = #{appkey,jdbcType=VARCHAR},
+      </if>
+      <if test="appsecret != null" >
+        appSecret = #{appsecret,jdbcType=VARCHAR},
+      </if>
+      <if test="accesstoken != null" >
+        accessToken = #{accesstoken,jdbcType=VARCHAR},
+      </if>
+      <if test="store != null" >
+        store = #{store,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where customer_id = #{customerId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.edu.bupt.wechatpost.model.CameraUser" >
+    update camera_user
+    set appKey = #{appkey,jdbcType=VARCHAR},
+      appSecret = #{appsecret,jdbcType=VARCHAR},
+      accessToken = #{accesstoken,jdbcType=VARCHAR},
+      store = #{store,jdbcType=VARCHAR}
+    where customer_id = #{customerId,jdbcType=INTEGER}
+  </update>
+</mapper>

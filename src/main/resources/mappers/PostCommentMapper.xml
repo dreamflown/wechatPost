@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.edu.bupt.wechatpost.dao.PostCommentMapper">
+
+    <!--通过openid查询post列表-->
+    <select id="selectPostByOpenId"  resultMap="postCommentMap">
+        SELECT  post.id , post.avatar, post.nickname, post.createTime, post.content, post.image, post.location, post.favoriteNum,
+                comment.id c_id, comment.nickname c_nickname, comment.c_content
+        FROM post LEFT JOIN comment ON post.id=comment.p_id
+        <if test="openId != null">
+            WHERE openid = #{openId, jdbcType=VARCHAR}
+        </if>
+        ORDER BY post.id DESC
+    </select>
+    <resultMap id="postCommentMap" type="Post" autoMapping="true">
+        <id property="id" column="id" javaType="java.lang.Integer"/>
+        <result property="avatar" column="avatar"/>
+        <result property="nickname" column="nickname" />
+        <result property="createTime" column="createTime"/>
+        <result property="content" column="content"/>
+        <result property="image" column="image"/>
+        <result property="location" column="location"/>
+        <result property="favoriteNum" column="favoriteNum"/>
+        <collection property="comments" ofType="com.edu.bupt.wechatpost.model.Comment" >
+            <id property="id" column="c_id" javaType="java.lang.Integer"/>
+            <result property="nickname" column="c_nickname"/>
+            <result property="c_content" column="c_content"/>
+        </collection>
+    </resultMap>
+
+    <!--关键词模糊查询消息-->
+    <select id="selectByKeySelective" parameterType="java.lang.String" resultMap="postCommentMap">
+        SELECT  post.id , post.nickname, post.createTime, post.content, post.image, post.location, post.favoriteNum,
+        comment.id c_id, comment.nickname c_nickname, comment.c_content
+        FROM post LEFT JOIN comment ON post.id=comment.p_id
+        <if test="searchText != ''">
+            WHERE post.nickname LIKE '%${searchText}%'
+            OR createTime LIKE binary '%${searchText}%'
+            OR content LIKE '%${searchText}%'
+        </if>
+        ORDER BY post.id DESC
+
+    </select>
+
+    <!--删除post-->
+    <delete id="deletePostByPostId">
+    delete from post
+    where id = #{pId,jdbcType=INTEGER}
+    </delete>
+
+    <!--插入post-->
+    <insert id="insertPostSelective" parameterType="com.edu.bupt.wechatpost.model.Post">
+        insert into post
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="pId != null">
+                id,
+            </if>
+            <if test="openId != null">
+                openid,
+            </if>
+            <if test="avatar != null">
+                avatar,
+            </if>
+            <if test="nickName != null">
+                nickname,
+            </if>
+            <if test="createTime != null">
+                createTime,
+            </if>
+            <if test="content != null">
+                content,
+            </if>
+            <if test="image != null">
+                image,
+            </if>
+            <if test="location != null">
+                location,
+            </if>
+            <if test="favoriteNum != null">
+                favoriteNum,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="pId != null">
+                #{pId,jdbcType=INTEGER},
+            </if>
+            <if test="openId != null">
+                #{openId,jdbcType=VARCHAR},
+            </if>
+            <if test="avatar != null">
+                #{avatar,jdbcType=VARCHAR},
+            </if>
+            <if test="nickName != null">
+                #{nickName,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=VARCHAR},
+            </if>
+            <if test="content != null">
+                #{content,jdbcType=VARCHAR},
+            </if>
+            <if test="image != null">
+                #{image,jdbcType=VARCHAR},
+            </if>
+            <if test="location != null">
+                #{location,jdbcType=VARCHAR},
+            </if>
+            <if test="favoriteNum != null">
+                #{favoriteNum,jdbcType=INTEGER},
+            </if>
+        </trim>
+    </insert>
+
+    <!--点赞-->
+    <update id="updateFavoriteNum" parameterType="map">
+    update post
+    set favoriteNum = #{num, jdbcType=INTEGER} + favoriteNum
+    where id = #{pId, jdbcType=VARCHAR}
+    </update>
+
+    <!--插入评论-->
+    <insert id="insertComment" parameterType="com.edu.bupt.wechatpost.model.Comment" keyProperty="id" useGeneratedKeys="true">
+    insert into comment (id, p_id, nickname, c_content)
+    values (#{cId,jdbcType=INTEGER}, #{pId,jdbcType=INTEGER},
+             #{nickName,jdbcType=VARCHAR},#{cContent,jdbcType=VARCHAR})
+    </insert>
+
+    <!--删除评论-->
+    <delete id="deleteCommentByCommentId">
+    delete from comment
+    where id = #{cId,jdbcType=INTEGER}
+    </delete>
+
+    <select id="selectCommentById" parameterType="java.lang.Integer" resultType="Comment">
+        SELECT * FROM comment where id = #{id,jdbcType =INTEGER}
+    </select>
+
+    <select id="selectPostById" parameterType="java.lang.Integer" resultType="Post">
+        SELECT * FROM post WHERE id = #{id, jdbcType=INTEGER}
+    </select>
+</mapper>

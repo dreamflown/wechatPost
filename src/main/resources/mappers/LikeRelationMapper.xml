@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.edu.bupt.wechatpost.dao.LikeRelationMapper">
+    <select id="selectById" parameterType="java.lang.Integer" resultMap="LikeRelationMap">
+        SELECT * FROM like_relation WHERE id = #{id, jdbcType=INTEGER}
+    </select>
+    <resultMap id="LikeRelationMap" type="LikeRelation">
+        <id property="id" column="id" javaType="java.lang.Integer"/>
+        <result property="nickname" column="nickname" javaType="java.lang.String"/>
+        <result property="openid" column="openid" javaType="java.lang.String"></result>
+        <result property="p_id" column="p_id" javaType="java.lang.Integer"/>
+    </resultMap>
+
+    <select id="selectByOpenidAndPid" resultMap="LikeRelationMap">
+        SELECT * FROM like_relation
+        WHERE openid = #{openid, jdbcType=VARCHAR}
+        AND p_id = #{p_id, jdbcType=INTEGER}
+    </select>
+
+    <insert id="insert" keyProperty="id" useGeneratedKeys="true">
+        INSERT INTO like_relation
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="p_id != null">
+                p_id,
+            </if>
+            <if test="openid != null">
+                openid,
+            </if>
+            <if test="nickname != null">
+                nickname,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="p_id != null">
+                #{p_id,jdbcType=INTEGER},
+            </if>
+            <if test="openid != null">
+                #{openid,jdbcType=VARCHAR},
+            </if>
+            <if test="nickname != null">
+                #{nickname,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+
+    <delete id="delete">
+        DELETE FROM like_relation
+        WHERE openid = #{openid, jdbcType=VARCHAR}
+        AND p_id = #{p_id, jdbcType=INTEGER}
+    </delete>
+
+</mapper>

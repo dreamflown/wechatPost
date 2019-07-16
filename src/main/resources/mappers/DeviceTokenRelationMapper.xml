@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.edu.bupt.wechatpost.dao.DeviceTokenRelationMapper">
+    <select id = "selectIEEEByUuid" resultType="java.lang.String">
+      SELECT IEEE FROM deviceTokenRelation WHERE uuid = #{uuid, jdbcType=VARCHAR}
+    </select>
+
+    <select id = "selectUuidByIEEE" resultType="java.lang.String">
+        SELECT uuid FROM deviceTokenRelation WHERE IEEE = #{ieee, jdbcType=VARCHAR}
+    </select>
+</mapper>

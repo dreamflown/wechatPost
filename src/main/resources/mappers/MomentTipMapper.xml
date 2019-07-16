@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.edu.bupt.wechatpost.dao.MomentTipMapper">
+
+    <resultMap id="MomentTipMap" type="MomentTip">
+        <id property="id" column="id" javaType="java.lang.Integer"/>
+        <result property="touser" column="touser" javaType="java.lang.String"/>
+        <result property="createTime" column="createTime"/>
+        <result property="avator" column="avator" javaType="java.lang.String"/>
+        <result property="action_id" column="action_id" javaType="java.lang.Integer"/>
+        <result property="action_type" column="action_type" javaType="java.lang.Integer"/>
+        <result property="isread" column="isread" javaType="java.lang.Integer"/>
+    </resultMap>
+
+    <select id="selectById" parameterType="java.lang.Integer" resultMap="MomentTipMap">
+        SELECT * FROM moment_tip WHERE id = #{id, jdbcType=INTEGER}
+    </select>
+
+    <!--查找所有的提示-->
+    <select id="selectByOpenid" parameterType="java.lang.String" resultMap="MomentTipMap">
+        SELECT * FROM moment_tip WHERE touser = #{touser, jdbcType=VARCHAR}
+        ORDER BY createTime DESC
+    </select>
+
+    <!--查找所有未读提示-->
+    <select id="selectUnreadByOpenid" parameterType="java.lang.String" resultMap="MomentTipMap">
+        SELECT  * FROM moment_tip WHERE touser= #{touser, jdbcType=VARCHAR} and isread = 0
+        ORDER BY createTime DESC
+    </select>
+
+    <update id="updateIsread">
+        UPDATE moment_tip SET isread = #{isread,jdbcType=BIT} WHERE touser = #{touser, jdbcType=VARCHAR}
+    </update>
+
+    <insert id="insert">
+        INSERT INTO moment_tip
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="touser != null">
+                touser,
+            </if>
+            <if test="createTime != null">
+                createTime,
+            </if>
+            <if test="avator != null">
+                avator,
+            </if>
+            <if test="action_id != null">
+                action_id,
+            </if>
+            <if test="action_type != null">
+                action_type,
+            </if>
+            <if test="isread != null">
+                isread,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="touser != null">
+                #{touser,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="avator != null">
+                #{avator,jdbcType=VARCHAR},
+            </if>
+            <if test="action_id != null">
+                #{action_id,jdbcType=INTEGER},
+            </if>
+            <if test="action_type != null">
+                #{action_type,jdbcType=INTEGER},
+            </if>
+            <if test="isread != null">
+                #{isread,jdbcType=BIT},
+            </if>
+        </trim>
+    </insert>
+
+    <delete id="delete">
+        DELETE FROM moment_tip
+        WHERE touser = #{touser, jdbcType=VARCHAR}
+        AND action_id = #{action_id, jdbcType=INTEGER}
+    </delete>
+
+</mapper>

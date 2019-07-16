@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.edu.bupt.wechatpost.dao.CameraMapper" >
+  <resultMap id="BaseResultMap" type="com.edu.bupt.wechatpost.model.Camera" >
+    <constructor >
+      <idArg column="id" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <arg column="serial" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <arg column="name" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <arg column="last_online" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <arg column="state" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <arg column="version" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <arg column="model" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <arg column="manufature" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <arg column="group" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <arg column="store" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <arg column="discription" jdbcType="LONGVARCHAR" javaType="java.lang.String" />
+    </constructor>
+  </resultMap>
+  <!--<resultMap id="ResultMapWithBLOBs" type="com.edu.bupt.wechatpost.model.Camera" >-->
+    <!--<constructor >-->
+      <!--<idArg column="id" jdbcType="VARCHAR" javaType="java.lang.String" />-->
+      <!--<arg column="serial" jdbcType="VARCHAR" javaType="java.lang.String" />-->
+      <!--<arg column="name" jdbcType="VARCHAR" javaType="java.lang.String" />-->
+      <!--<arg column="last_online" jdbcType="VARCHAR" javaType="java.lang.String" />-->
+      <!--<arg column="state" jdbcType="VARCHAR" javaType="java.lang.String" />-->
+      <!--<arg column="version" jdbcType="VARCHAR" javaType="java.lang.String" />-->
+      <!--<arg column="model" jdbcType="VARCHAR" javaType="java.lang.String" />-->
+      <!--<arg column="manufature" jdbcType="VARCHAR" javaType="java.lang.String" />-->
+      <!--<arg column="group" jdbcType="VARCHAR" javaType="java.lang.String" />-->
+      <!--<arg column="store" jdbcType="VARCHAR" javaType="java.lang.String" />-->
+      <!--<arg column="discription" jdbcType="LONGVARCHAR" javaType="java.lang.String" />-->
+    <!--</constructor>-->
+  <!--</resultMap>-->
+  <sql id="Base_Column_List" >
+    id, serial, name, last_online, state, version, model, manufature, group, store,discription
+  </sql>
+  <!--<sql id="Blob_Column_List" >-->
+    <!--discription-->
+  <!--</sql>-->
+  <!--<select id="selectByPrimaryKey" resultType="ResultMapWithBLOBs" parameterType="java.lang.String" >-->
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select
+    <include refid="Base_Column_List" />
+    <!--,-->
+    <!--<include refid="Blob_Column_List" />-->
+    <!--from camera-->
+    where id = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from camera
+    where id = #{id,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.edu.bupt.wechatpost.model.Camera" >
+    insert into camera (id, serial, name, 
+      last_online, state, version, 
+      model, manufature, group, 
+      store, discription)
+    values (#{id,jdbcType=VARCHAR}, #{serial,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, 
+      #{lastOnline,jdbcType=VARCHAR}, #{state,jdbcType=VARCHAR}, #{version,jdbcType=VARCHAR}, 
+      #{model,jdbcType=VARCHAR}, #{manufature,jdbcType=VARCHAR}, #{group,jdbcType=VARCHAR}, 
+      #{store,jdbcType=VARCHAR}, #{discription,jdbcType=LONGVARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.edu.bupt.wechatpost.model.Camera" >
+    insert into camera
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="serial != null" >
+        serial,
+      </if>
+      <if test="name != null" >
+        name,
+      </if>
+      <if test="lastOnline != null" >
+        last_online,
+      </if>
+      <if test="state != null" >
+        state,
+      </if>
+      <if test="version != null" >
+        version,
+      </if>
+      <if test="model != null" >
+        model,
+      </if>
+      <if test="manufature != null" >
+        manufature,
+      </if>
+      <if test="group != null" >
+        group,
+      </if>
+      <if test="store != null" >
+        store,
+      </if>
+      <if test="discription != null" >
+        discription,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="serial != null" >
+        #{serial,jdbcType=VARCHAR},
+      </if>
+      <if test="name != null" >
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="lastOnline != null" >
+        #{lastOnline,jdbcType=VARCHAR},
+      </if>
+      <if test="state != null" >
+        #{state,jdbcType=VARCHAR},
+      </if>
+      <if test="version != null" >
+        #{version,jdbcType=VARCHAR},
+      </if>
+      <if test="model != null" >
+        #{model,jdbcType=VARCHAR},
+      </if>
+      <if test="manufature != null" >
+        #{manufature,jdbcType=VARCHAR},
+      </if>
+      <if test="group != null" >
+        #{group,jdbcType=VARCHAR},
+      </if>
+      <if test="store != null" >
+        #{store,jdbcType=VARCHAR},
+      </if>
+      <if test="discription != null" >
+        #{discription,jdbcType=LONGVARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.edu.bupt.wechatpost.model.Camera" >
+    update camera
+    <set >
+      <if test="serial != null" >
+        serial = #{serial,jdbcType=VARCHAR},
+      </if>
+      <if test="name != null" >
+        name = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="lastOnline != null" >
+        last_online = #{lastOnline,jdbcType=VARCHAR},
+      </if>
+      <if test="state != null" >
+        state = #{state,jdbcType=VARCHAR},
+      </if>
+      <if test="version != null" >
+        version = #{version,jdbcType=VARCHAR},
+      </if>
+      <if test="model != null" >
+        model = #{model,jdbcType=VARCHAR},
+      </if>
+      <if test="manufature != null" >
+        manufature = #{manufature,jdbcType=VARCHAR},
+      </if>
+      <if test="group != null" >
+        group = #{group,jdbcType=VARCHAR},
+      </if>
+      <if test="store != null" >
+        store = #{store,jdbcType=VARCHAR},
+      </if>
+      <if test="discription != null" >
+        discription = #{discription,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.edu.bupt.wechatpost.model.Camera" >
+    update camera
+    set serial = #{serial,jdbcType=VARCHAR},
+      name = #{name,jdbcType=VARCHAR},
+      last_online = #{lastOnline,jdbcType=VARCHAR},
+      state = #{state,jdbcType=VARCHAR},
+      version = #{version,jdbcType=VARCHAR},
+      model = #{model,jdbcType=VARCHAR},
+      manufature = #{manufature,jdbcType=VARCHAR},
+      group = #{group,jdbcType=VARCHAR},
+      store = #{store,jdbcType=VARCHAR},
+      discription = #{discription,jdbcType=LONGVARCHAR}
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.edu.bupt.wechatpost.model.Camera" >
+    update camera
+    set serial = #{serial,jdbcType=VARCHAR},
+      name = #{name,jdbcType=VARCHAR},
+      last_online = #{lastOnline,jdbcType=VARCHAR},
+      state = #{state,jdbcType=VARCHAR},
+      version = #{version,jdbcType=VARCHAR},
+      model = #{model,jdbcType=VARCHAR},
+      manufature = #{manufature,jdbcType=VARCHAR},
+      group = #{group,jdbcType=VARCHAR},
+      store = #{store,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+</mapper>
