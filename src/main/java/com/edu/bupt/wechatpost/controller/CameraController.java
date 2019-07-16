@@ -29,7 +29,7 @@ public class CameraController {
     public JSONObject getTocken(@RequestParam("customerId")Integer id) throws Exception{
         JSONObject ret = new JSONObject();
         System.out.println(id);
-        CameraUser user = cameraService.getAccessTocken(id);
+        CameraUser user = cameraService.getAccessToken(id);
         String result = user.getAccesstoken();
         ret.put("code",result);
         if(result.equals("404")){

@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface CameraService {
     boolean validAccessToken(CameraUser user);
-    CameraUser getaccessToken(Integer customerId);
+    CameraUser getAccessToken(Integer customerId);
     String updateUserInfo(CameraUser user);
     String sendForaccessToken(Integer customerId);
     String register(String appKey, String appSecret);

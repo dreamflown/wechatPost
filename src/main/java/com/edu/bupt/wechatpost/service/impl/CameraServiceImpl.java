@@ -90,7 +90,7 @@ public class CameraServiceImpl implements CameraService {
     }
 
 
-    public CameraUser getaccessToken(Integer customerId){
+    public CameraUser getAccessToken(Integer customerId){
         CameraUser user = null;
         user = userMapper.selectByPrimaryKey(customerId);
         return user;
