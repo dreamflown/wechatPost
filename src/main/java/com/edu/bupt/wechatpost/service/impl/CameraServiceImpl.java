@@ -421,5 +421,4 @@ public class CameraServiceImpl implements CameraService {
         return 0;
     }
 
-
 }
