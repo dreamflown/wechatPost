@@ -3,11 +3,14 @@ package com.edu.bupt.wechatpost.service;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.edu.bupt.wechatpost.model.Camera;
+import com.edu.bupt.wechatpost.model.CameraUser;
 
 import java.util.List;
 
 public interface CameraService {
-    String getAccessTocken(Integer customer_id);
+    boolean validAccessToken(CameraUser user);
+    String updateUserInfo(CameraUser user);
+    String sendForAccessTocken(Integer customer_id);
     String register(String appKey, String appSecret);
     JSONArray getLiveAddressList(Integer customer_id);
     JSONArray getLiveAddrBydeviceSerial(Integer customer_id,String deviceSerial,String cam);

@@ -2,6 +2,7 @@ package com.edu.bupt.wechatpost.controller;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.edu.bupt.wechatpost.model.CameraUser;
 import com.edu.bupt.wechatpost.service.CameraService;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
@@ -23,9 +24,9 @@ public class CameraController {
 
 //    @ApiOperation(value = "getAccessTocken",notes = "get the tocken forme ys7")
 //    @ApiImplicitParam(name = "appInfo", value = "the username and passwd info", required = true, dataType = "JSONObject")
-    @RequestMapping(value = "/getTocken", method = RequestMethod.GET)
+    @RequestMapping(value = "/accesstoken/udpate", method = RequestMethod.GET)
     public String getTocken(@RequestParam("customerId")Integer id) throws Exception{
-        return cameraService.getAccessTocken(id);
+        return cameraService.sendForAccessTocken(id);
     }
 
     @RequestMapping(value = "/register", method = RequestMethod.POST)
@@ -33,6 +34,18 @@ public class CameraController {
         String appKey = appInfo.getString("appKey");
         String appSecret = appInfo.getString("appSecret");
         return cameraService.register(appKey, appSecret);
+    }
+
+    @RequestMapping(value = "/user/update", method = RequestMethod.POST)
+    public String updateUserInfo(@RequestBody JSONObject appInfo) throws Exception{
+        Integer customerId = appInfo.getInteger("customerId");
+        String appKey = appInfo.getString("appKey");
+        String appSecret = appInfo.getString("appSecret");
+        CameraUser user = new CameraUser();
+        user.setCustomerId(customerId);
+        user.setAppkey(appKey);
+        user.setAppsecret(appSecret);
+        return cameraService.updateUserInfo(user);
     }
 
     /**
