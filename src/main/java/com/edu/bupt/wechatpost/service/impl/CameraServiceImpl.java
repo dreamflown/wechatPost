@@ -455,7 +455,7 @@ public class CameraServiceImpl implements CameraService {
                     JSONObject cameraJson = new JSONObject();
                     cameraJson.put("cameraId",camera.getId());
                     cameraJson.put("deviceSerial",camera.getSerial());
-                    ret.put("msg",cameraJson);
+                    ret.put("msg",getDeviceBySerial(customerId,serial).getJSONObject("msg"));
                     break;
                 } else {
                     ret.put("status","500");
@@ -580,6 +580,42 @@ public class CameraServiceImpl implements CameraService {
         String response = this.POST(request);
         if(null != response){
             ret.put("msg",JSONObject.parseObject(response).getString("msg"));
+            ret.put("status","200");
+        }else{
+            ret.put("status","500");
+            ret.put("msg","内部错误");
+        }
+        return ret;
+    }
+
+
+    public JSONObject getDeviceBySerial(Integer customerId,String serial){
+        String postUrl = "https://open.ys7.com/api/lapp/device/info";
+
+        JSONObject ret = new JSONObject();
+        CameraUser user = getAccessToken(customerId);
+        String accessToken = new String();
+        if (user == null) {
+            ret.put("status","404");
+            ret.put("msg","未注册");
+            return ret;
+        }
+        if (!validAccessToken(user)) {
+            accessToken = sendForaccessToken(customerId);
+        } else {
+            accessToken = user.getAccesstoken();
+        }
+        okhttp3.RequestBody body = new FormBody.Builder()
+                .add("accessToken", accessToken)
+                .add("deviceSerial",serial).build();
+        Request request = new Request.Builder()
+                .url(postUrl)
+                .post(body)
+                .build();
+
+        String response = this.POST(request);
+        if(null != response){
+            ret.put("msg",JSONObject.parseObject(response).getJSONObject("data"));
             ret.put("status","200");
         }else{
             ret.put("status","500");

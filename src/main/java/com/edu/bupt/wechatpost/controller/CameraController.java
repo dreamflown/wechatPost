@@ -210,6 +210,12 @@ public class CameraController {
         return cameraService.register(data);
     }
 
+    /**
+     * 用户注册 测试完成
+     * @param data
+     * @return
+     * @throws Exception
+     */
 
     /**
      * 修改报警参数设置

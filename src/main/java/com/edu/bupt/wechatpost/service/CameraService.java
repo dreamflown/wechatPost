@@ -24,6 +24,7 @@ public interface CameraService {
     JSONObject delDevice(Integer customer_id,String serial);
     JSONObject dealGetDevices(Integer customerId);
     JSONObject updateDeviceInfo(JSONObject cameraJson);
+    JSONObject getDeviceBySerial(Integer customerId,String serial);
     int updateAlarmSettings(Integer customer_id, String serial);
     int dealAddDevice(Integer customerId, Camera camera);
     int dealDeleteDevice(Integer customerId, String camera_id);
