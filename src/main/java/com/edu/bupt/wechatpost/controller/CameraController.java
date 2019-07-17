@@ -27,13 +27,13 @@ public class CameraController {
         JSONObject ret = new JSONObject();
         System.out.println(id);
         String result = cameraService.sendForaccessToken(id);
-        ret.put("code",result);
+        ret.put("status",result);
         if(result.equals("404")){
             ret.put("msg","用户未注册");
         }else if(result.equals("500")){
             ret.put("msh","内部错误");
         }else{
-            ret.put("code","200");
+            ret.put("status","200");
             ret.put("msg",result);
         }
         return ret;
@@ -293,11 +293,4 @@ public class CameraController {
 //        return cameraService.setAlarm(userInfo, type, state);
 //    }
 
-
-    @RequestMapping(value = "/test", method = RequestMethod.POST)
-    public JSONObject test(@RequestBody JSONObject data) {
-        return cameraService.test(data.getInteger("customerId"),data.getString("serial"),
-                data.getString("validateCode"),data.getString("name"),
-                data.getString("discription"));
-    }
 }

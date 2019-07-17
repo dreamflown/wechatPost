@@ -27,6 +27,13 @@
     delete from camera_user_relation
     where id = #{id,jdbcType=INTEGER}
   </delete>
+
+  <delete id ="deleteByCustomerIdAndCameraId" parameterType = "java.lang.String">
+    delete from camera_user_relation
+    where camera_id = #{cameraId,jdbcType=VARCHAR}
+  </delete>
+
+
   <insert id="insert" parameterType="com.edu.bupt.wechatpost.model.CameraUserRelation" >
     insert into camera_user_relation (id, camera_id, customer_id
       )

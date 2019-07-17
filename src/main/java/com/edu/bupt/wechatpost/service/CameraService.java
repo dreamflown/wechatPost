@@ -8,7 +8,7 @@ import com.edu.bupt.wechatpost.model.CameraUser;
 import java.util.List;
 
 public interface CameraService {
-    JSONObject test(Integer customer_id, String serial,String validateCode, String name,String discription);
+
     boolean validAccessToken(CameraUser user);
     CameraUser getAccessToken(Integer customerId);
     String updateUserInfo(CameraUser user);
