@@ -11,7 +11,8 @@ public class CameraUser {
 
     private String store;
 
-    public CameraUser(Integer customerId, String appkey, String appsecret, String accesstoken, String store) {
+    public CameraUser(Integer customerId, String appkey,
+                      String appsecret, String accesstoken, String store) {
         this.customerId = customerId;
         this.appkey = appkey;
         this.appsecret = appsecret;
@@ -59,7 +60,4 @@ public class CameraUser {
         return store;
     }
 
-    public void setStore(String store) {
-        this.store = store == null ? null : store.trim();
-    }
 }

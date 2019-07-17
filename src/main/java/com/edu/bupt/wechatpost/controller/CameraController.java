@@ -202,24 +202,17 @@ public class CameraController {
     }
 
     /**
-     * 用户注册 cewanle
+     * 用户注册
      * @param data
      * @return
      * @throws Exception
      */
     @RequestMapping(value = "/register", method = RequestMethod.POST)
-    public JSONObject register(@RequestBody JSONObject data){
+    public JSONObject register(@RequestBody JSONObject data) {
 
-        System.out.println(data.toJSONString());
-        JSONObject ret = new JSONObject();
-        String res = cameraService.register(data);
-        ret.put("msg",res);
-        ret.put("code","200");
-        if(res.equals("fail")){
-            ret.put("code","403");
-        }
-        return ret;
+        return cameraService.register(data);
     }
+
 
     /**
      * 修改报警参数设置

@@ -43,25 +43,36 @@ public class CameraServiceImpl implements CameraService {
         CameraUser user = userMapper.selectByPrimaryKey(customerId);
         return JSONObject.parseObject(user.toString());
     }
+    private boolean isAppkeyRegisted(Integer customerId,String appKey){
+
+        return false;
+    }
 
     //chewangle
-    public String register(JSONObject userJson){
-        String resp = "succeed";
+    public JSONObject register(JSONObject userJson){
+        JSONObject resp = new JSONObject();
         int insert;
         CameraUser user = new CameraUser();
         user.setCustomerId(userJson.getInteger("customerId"));
         user.setAppkey(userJson.getString("appkey"));
         user.setAppsecret(userJson.getString("appSecret"));
+        if(false == isAppkeyRegisted(user.getCustomerId(),user.getAppkey())){
+            resp.put("status","403");
+            resp.put("msg","该AppKey被人注册！");
+            return resp;
+        }
         String accessToken = sendForaccessToken(userJson.getInteger("customerId"),userJson.getString("appkey"),
                                                 userJson.getString("appSecret"));
 
         if (accessToken.equals("404") || accessToken.equals("500")) {
-            resp = "fail";
+            resp.put("status","400");
+            resp.put("msg","注册错误，请检查AppKey和appSecret！");
         } else {
             user.setAccesstoken(accessToken);
             insert = userMapper.insertSelective(user);
             if(insert == 0){
-                resp = "fail";
+                resp.put("status","200");
+                resp.put("msg","注册成功！");
            }
         }
         return resp;
@@ -258,10 +269,10 @@ public class CameraServiceImpl implements CameraService {
                 .build();
         String response = this.POST(request);
         if(null != response){
-            ret.put("data",JSONObject.parseObject(response).getJSONArray("data"));
+            ret.put("msg",JSONObject.parseObject(response).getJSONArray("data"));
             ret.put("status","200");
         }else{
-            ret.put("data","序列号错误");
+            ret.put("msg","请检查序列号和校验码！");
             ret.put("status","400");
         }
         return ret;
@@ -378,8 +389,9 @@ public class CameraServiceImpl implements CameraService {
         CameraUser user = getAccessToken(customerId);
         String accessToken = new String();
         if (user == null) {
-            ret.put("code","404");
+            ret.put("status","404");
             ret.put("msg","未注册");
+            return ret;
         }
         if (!validAccessToken(user)) {
             accessToken = sendForaccessToken(customerId);
@@ -407,30 +419,25 @@ public class CameraServiceImpl implements CameraService {
             }
             // 设置云平台的设备信息
             setDeviceName(customerId,camera.getSerial(),camera.getName());
-            ret.put("data",camera);
-            ret.put("msg", "success");
-            ret.put("code","200");
-
             // 存设备信息到数据库
             for (int i =0; i<3; i++) {
                 int add = dealAddDevice(customerId, camera);
                 if (add != 0) {
-                    ret.put("msg", "success");
-                    ret.put("code","200");
+                    ret.put("status","200");
                     JSONObject cameraJson = new JSONObject();
                     cameraJson.put("cameraId",camera.getId());
                     cameraJson.put("deviceSerial",camera.getSerial());
-                    ret.put("data",cameraJson);
+                    ret.put("msg",cameraJson);
                     break;
                 } else {
-                    ret.put("code","500");
+                    ret.put("status","500");
                     ret.put("msg", "fail");
                     continue;
                 }
             }
         }else{
-            ret.put("code","500");
-            ret.put("msg","该设备已经添加");
+            ret.put("status","500");
+            ret.put("msg","设备添加错误，请检查序列号和校验码！");
         }
         return ret;
     }
@@ -524,7 +531,7 @@ public class CameraServiceImpl implements CameraService {
         CameraUser user = getAccessToken(customerId);
         String accessToken = new String();
         if (user == null) {
-            ret.put("code","404");
+            ret.put("status","404");
             ret.put("msg","未注册");
         }
         if (!validAccessToken(user)) {
@@ -543,11 +550,11 @@ public class CameraServiceImpl implements CameraService {
 
         String response = this.POST(request);
         if(null != response){
-            ret.put("data",JSONObject.parseObject(response).getJSONObject("data"));
-            ret.put("code","200");
+            ret.put("msg",JSONObject.parseObject(response).getJSONObject("data"));
+            ret.put("status","200");
         }else{
-            ret.put("code","500");
-            ret.put("data","内部错误");
+            ret.put("status","500");
+            ret.put("msg","内部错误");
         }
         return ret;
     }
