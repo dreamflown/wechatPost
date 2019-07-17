@@ -520,7 +520,7 @@ public class CameraServiceImpl implements CameraService {
 
     @Override
     public JSONObject dealGetDevices(Integer customerId){
-        String postUrl = "https://open.ys7.com/api/lapp/camera/list";
+        String postUrl = "https://open.ys7.com/api/lapp/device/list";
         JSONObject ret = new JSONObject();
         CameraUser user = getAccessToken(customerId);
         String accessToken = new String();
