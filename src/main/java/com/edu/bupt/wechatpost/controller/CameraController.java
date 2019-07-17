@@ -1,6 +1,5 @@
 package com.edu.bupt.wechatpost.controller;
 
-import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.edu.bupt.wechatpost.model.CameraUser;
 import com.edu.bupt.wechatpost.service.CameraService;
@@ -20,8 +19,6 @@ public class CameraController {
 
     @Autowired
     private CameraService cameraService;
-
-
 
 
     @RequestMapping(value = "/getToken", method = RequestMethod.GET)
@@ -192,8 +189,6 @@ public class CameraController {
 //    }
 
 
-
-
     /**
      * 修改摄像头信息 cewanle
      * @param body
@@ -297,4 +292,12 @@ public class CameraController {
 //        userInfo.put("passwd",passwd);
 //        return cameraService.setAlarm(userInfo, type, state);
 //    }
+
+
+    @RequestMapping(value = "/test", method = RequestMethod.POST)
+    public JSONObject test(@RequestBody JSONObject data) {
+        return cameraService.test(data.getInteger("customerId"),data.getString("serial"),
+                data.getString("validateCode"),data.getString("name"),
+                data.getString("discription"));
+    }
 }

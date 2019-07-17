@@ -13,7 +13,6 @@ import okhttp3.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-
 import java.io.IOException;
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
@@ -23,7 +22,6 @@ import java.util.stream.Collectors;
 @Service
 public class CameraServiceImpl implements CameraService {
 
-    private JSONObject appInfo = new JSONObject();
     private static OkHttpClient client = new OkHttpClient();
 
     @Autowired
@@ -35,11 +33,45 @@ public class CameraServiceImpl implements CameraService {
     @Autowired
     private CameraUserRelationMapper relationMapper;
 
+    public JSONObject test(Integer customerId, String serial,String validateCode, String name,String discription){
+        JSONObject ret  = new JSONObject();
+        Camera camera = new Camera();
+        String id = UUID.fromString(serial).toString();
+        camera.setId(id);
+        camera.setSerial(serial);
+        camera.setDiscription(discription);
+//        camera.setGroup();
+        if (null == name){ // 如果用户为未命名，取id最后四位作为默认名
+            camera.setName("camera_"+ id.substring(id.length()-4, id.length()));
+        } else {
+            camera.setName(name);
+        }
 
-    private JSONObject  getAppInfoByuserInfo(Integer customerId){
-//        this.appInfo.clear();
-//        this.appInfo.put("appKey","2202b037f424462888e3918831dd9680");
-//        this.appInfo.put("appSecret","4e45ac4dbaf66fddb8afb4da7e313cef");
+        ret.put("data",camera);
+        ret.put("msg", "success");
+        ret.put("code","200");
+
+        // 存设备信息到数据库
+        for (int i =0; i<3; i++) {
+            int add = dealAddDevice(customerId, camera);
+            if (add != 0) {
+                ret.put("msg", "success");
+                ret.put("code","200");
+                JSONObject cameraJson = new JSONObject();
+                cameraJson.put("cameraId",camera.getId());
+                cameraJson.put("deviceSerial",camera.getSerial());
+                ret.put("data",cameraJson);
+                break;
+            } else {
+                ret.put("code","500");
+                ret.put("msg", "fail");
+                continue;
+            }
+        }
+        return ret;
+    }
+
+    private JSONObject getAppInfoByuserInfo(Integer customerId){
         CameraUser user = userMapper.selectByPrimaryKey(customerId);
         return JSONObject.parseObject(user.toString());
     }
@@ -49,11 +81,14 @@ public class CameraServiceImpl implements CameraService {
         String resp = "succeed";
         int insert;
         CameraUser user = new CameraUser();
+
         user.setCustomerId(userJson.getInteger("customerId"));
+        if (userMapper.selectByPrimaryKey(user.getCustomerId()) != null) {
+            return "fail";
+        }
         user.setAppkey(userJson.getString("appkey"));
         user.setAppsecret(userJson.getString("appSecret"));
-        String accessToken = sendForaccessToken(userJson.getInteger("customerId"),userJson.getString("appkey"),
-                                                userJson.getString("appSecret"));
+        String accessToken = sendForaccessToken(user.getCustomerId(), user.getAppkey(), user.getAppsecret());
 
         if (accessToken.equals("404") || accessToken.equals("500")) {
             resp = "fail";
@@ -109,7 +144,7 @@ public class CameraServiceImpl implements CameraService {
     public boolean validAccessToken(CameraUser user) {
 
         return false;
-
+        // TODO 数据库新增 timestamp 字段
 //        String timestamp = user.getStore();
 //        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
 //        ParsePosition pos = new ParsePosition(0);
@@ -211,7 +246,6 @@ public class CameraServiceImpl implements CameraService {
         }else{
             accessToken = user.getAccesstoken();
         }
-
 
         okhttp3.RequestBody body = new FormBody.Builder()
                 .add("accessToken", accessToken).build();
@@ -374,16 +408,20 @@ public class CameraServiceImpl implements CameraService {
 
         JSONObject ret = new JSONObject();
         CameraUser user = getAccessToken(customerId);
-        String accessToken = new String();
         if (user == null) {
             ret.put("code","404");
             ret.put("msg","未注册");
+            ret.put("dara", null);
+            return ret;
         }
+
+        String accessToken = new String();
         if (!validAccessToken(user)) {
             accessToken = sendForaccessToken(customerId);
         } else {
             accessToken = user.getAccesstoken();
         }
+
         okhttp3.RequestBody body = new FormBody.Builder()
                 .add("accessToken", accessToken)
                 .add("deviceSerial",serial)
@@ -396,39 +434,43 @@ public class CameraServiceImpl implements CameraService {
         String response = this.POST(request);
         if(null != response){
             // add device into database
-            String id = serial;
+            String id = UUID.fromString(serial).toString();
             camera.setId(id);
             camera.setSerial(serial);
-            camera.setName(name);
-            if (null == camera.getName()){ // 取id最后四位作为默认名
-                camera.setName("camera_"+ id.substring(id.length()-4, id.length()));
-            }
-            setDeviceName(customerId,camera.getSerial(),camera.getName());
             camera.setDiscription(discription);
-            JSONObject cameraJson = new JSONObject();
+            if (null == name){ // 如果用户为未命名，取id最后四位作为默认名
+                camera.setName("camera_"+ id.substring(id.length()-4, id.length()));
+            } else {
+                camera.setName(name);
+            }
+            // 设置云平台的设备信息
+            setDeviceName(customerId,camera.getSerial(),camera.getName());
 
-            cameraJson.put("cameraId",camera.getId());
-            cameraJson.put("deviceSerial",camera.getSerial());
-            ret.put("data",cameraJson);
+//            JSONObject cameraJson = new JSONObject();
+//            cameraJson.put("cameraId",camera.getId());
+//            cameraJson.put("deviceSerial",camera.getSerial());
+//            ret.put("data",cameraJson);
+            ret.put("data",camera);
             ret.put("msg", "success");
             ret.put("code","200");
-//
-//            for (int i =0; i<3; i++) {
-//                int add = dealAddDevice(customerId, camera);
-//                if (add != 0) {
-//                    ret.put("msg", "success");
-//                    ret.put("code","200");
-//                    JSONObject cameraJson = new JSONObject();
-//                    cameraJson.put("cameraId",camera.getId());
-//                    cameraJson.put("deviceSerial",camera.getSerial());
-//                    ret.put("data",cameraJson);
-//                    break;
-//                } else {
-//                    ret.put("code","500");
-//                    ret.put("msg", "fail");
-//                    continue;
-//                }
-//            }
+
+            // 存设备信息到数据库
+            for (int i =0; i<3; i++) {
+                int add = dealAddDevice(customerId, camera);
+                if (add != 0) {
+                    ret.put("msg", "success");
+                    ret.put("code","200");
+                    JSONObject cameraJson = new JSONObject();
+                    cameraJson.put("cameraId",camera.getId());
+                    cameraJson.put("deviceSerial",camera.getSerial());
+                    ret.put("data",cameraJson);
+                    break;
+                } else {
+                    ret.put("code","500");
+                    ret.put("msg", "fail");
+                    continue;
+                }
+            }
         }else{
             ret.put("code","500");
             ret.put("msg","该设备已经添加");
@@ -464,18 +506,18 @@ public class CameraServiceImpl implements CameraService {
         if(null != response){
             ret.put("data",JSONObject.parseObject(response));
             ret.put("code","200");
-//            for (int i = 0; i<3; i++) {
-//                int delete = dealDeleteDevice(customerId,deviceSerial);
-//                if (delete != 0) {
-//                    ret.put("sql", "success");
-//                    ret.put("code","200");
-//                    break;
-//                } else {
-//                    ret.put("code","500");
-//                    ret.put("sql", "fail");
-//                    continue;
-//                }
-//            }
+            for (int i = 0; i<3; i++) {
+                int delete = dealDeleteDevice(customerId,deviceSerial);
+                if (delete != 0) {
+                    ret.put("sql", "success");
+                    ret.put("code","200");
+                    break;
+                } else {
+                    ret.put("code","500");
+                    ret.put("sql", "fail");
+                    continue;
+                }
+            }
         }else{
             ret.put("code","500");
             ret.put("data",JSONObject.parseObject(response));
