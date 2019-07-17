@@ -44,19 +44,18 @@ public class CameraServiceImpl implements CameraService {
         return JSONObject.parseObject(user.toString());
     }
     private boolean isAppkeyRegisted(Integer customerId,String appKey){
-
         return false;
     }
 
     //chewangle
     public JSONObject register(JSONObject userJson){
         JSONObject resp = new JSONObject();
-        int insert;
+        int insert = 0;
         CameraUser user = new CameraUser();
         user.setCustomerId(userJson.getInteger("customerId"));
         user.setAppkey(userJson.getString("appkey"));
         user.setAppsecret(userJson.getString("appSecret"));
-        if(false == isAppkeyRegisted(user.getCustomerId(),user.getAppkey())){
+        if(true == isAppkeyRegisted(user.getCustomerId(),user.getAppkey())){
             resp.put("status","403");
             resp.put("msg","该AppKey被人注册！");
             return resp;
@@ -69,8 +68,13 @@ public class CameraServiceImpl implements CameraService {
             resp.put("msg","注册错误，请检查AppKey和appSecret！");
         } else {
             user.setAccesstoken(accessToken);
-            insert = userMapper.insertSelective(user);
-            if(insert == 0){
+            try {
+                insert = userMapper.insertSelective(user);
+            }catch (Exception e){
+                resp.put("status","500");
+                resp.put("msg","你已经注册过了");
+            }
+            if(insert == 1){
                 resp.put("status","200");
                 resp.put("msg","注册成功！");
            }
@@ -550,7 +554,7 @@ public class CameraServiceImpl implements CameraService {
 
         String response = this.POST(request);
         if(null != response){
-            ret.put("msg",JSONObject.parseObject(response).getJSONObject("data"));
+            ret.put("msg",JSONObject.parseObject(response).getString("msg"));
             ret.put("status","200");
         }else{
             ret.put("status","500");

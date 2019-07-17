@@ -11,6 +11,8 @@ public class CameraUser {
 
     private String store;
 
+//    private Integer authority;
+
     public CameraUser(Integer customerId, String appkey,
                       String appsecret, String accesstoken, String store) {
         this.customerId = customerId;
@@ -18,6 +20,8 @@ public class CameraUser {
         this.appsecret = appsecret;
         this.accesstoken = accesstoken;
         this.store = store;
+//        this.authority = authority;
+
     }
 
     public CameraUser() {
@@ -59,5 +63,9 @@ public class CameraUser {
     public String getStore() {
         return store;
     }
+//    public Integer getAuthority(){
+//        return authority;
+//    }
+//    public void setAuthority(Integer authority){this.authority = authority;}
 
 }
