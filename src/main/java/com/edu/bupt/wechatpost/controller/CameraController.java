@@ -21,6 +21,10 @@ public class CameraController {
     private CameraService cameraService;
 
 
+
+    /*
+    *   测试完成
+    * */
     @RequestMapping(value = "/getToken", method = RequestMethod.GET)
     @ResponseBody
     public JSONObject getToken(@RequestParam("customerId")Integer id) throws Exception{
@@ -40,15 +44,8 @@ public class CameraController {
     }
 
     @RequestMapping(value = "/user/update", method = RequestMethod.POST)
-    public String updateUserInfo(@RequestBody JSONObject appInfo) throws Exception{
-        Integer customerId = appInfo.getInteger("customerId");
-        String appKey = appInfo.getString("appKey");
-        String appSecret = appInfo.getString("appSecret");
-        CameraUser user = new CameraUser();
-        user.setCustomerId(customerId);
-        user.setAppkey(appKey);
-        user.setAppsecret(appSecret);
-        return cameraService.updateUserInfo(user);
+    public JSONObject updateUserInfo(@RequestBody JSONObject userInfo) throws Exception{
+        return cameraService.updateUserInfo(userInfo);
     }
 
     /**
@@ -64,7 +61,7 @@ public class CameraController {
     }
 
     /**
-     * 获取摄像头流地址列表   cewanle
+     * 获取摄像头流地址列表   测试完成
      * @param serial
      * @return
      * @throws Exception
@@ -132,7 +129,7 @@ public class CameraController {
 
 
     /**
-     * 添加摄像头 ceshitongguo
+     * 添加摄像头 测试完成
      * @param data
      * @return
      * @throws Exception
@@ -148,7 +145,7 @@ public class CameraController {
 
 
     /**
-     * 删除摄像头 ceshitongguo
+     * 删除摄像头 测试完成
      * @param serial
      * @return
      * @throws Exception
@@ -190,7 +187,7 @@ public class CameraController {
 
 
     /**
-     * 修改摄像头信息 cewanle
+     * 修改摄像头信息 测试完成
      * @param body
      * @return
      * @throws Exception
@@ -202,7 +199,7 @@ public class CameraController {
     }
 
     /**
-     * 用户注册
+     * 用户注册 测试完成
      * @param data
      * @return
      * @throws Exception

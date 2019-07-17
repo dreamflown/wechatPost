@@ -52,6 +52,7 @@ public class CameraServiceImpl implements CameraService {
         JSONObject resp = new JSONObject();
         int insert = 0;
         CameraUser user = new CameraUser();
+
         user.setCustomerId(userJson.getInteger("customerId"));
         user.setAppkey(userJson.getString("appkey"));
         user.setAppsecret(userJson.getString("appSecret"));
@@ -82,12 +83,33 @@ public class CameraServiceImpl implements CameraService {
         return resp;
     }
 
-    public String updateUserInfo(CameraUser user){
-        int update = userMapper.updateByPrimaryKeySelective(user);
-        if (update == 0){
-            return "false";
+    public JSONObject updateUserInfo(JSONObject userInfo){
+        JSONObject ret = new JSONObject();
+        String reslt =new String();
+        CameraUser user = new CameraUser();
+        user.setCustomerId(userInfo.getInteger("customerId"));
+        user.setAppkey(userInfo.getString("appKey"));
+        user.setAppsecret(userInfo.getString("appSecret"));
+        reslt = sendForaccessToken(userInfo.getInteger("customerId"),
+                                    userInfo.getString("appKey"),
+                                    userInfo.getString("appSecret"));
+
+        if(reslt.equals("404")||reslt.equals("500")){
+            ret.put("status","400");
+            ret.put("msg","请检查appKey和appSecret并且检查是否注册");
+            return ret;
         }
-        return "succeed";
+        user.setAccesstoken(reslt);
+
+        int update = userMapper.updateByPrimaryKeySelective(user);
+        if (1 == update){
+            ret.put("status","200");
+            ret.put("msg","修改信息成功");
+        }else{
+            ret.put("status","400");
+            ret.put("msg","修改信息失败,请检查appKey和appSecret");
+        }
+        return ret;
     }
 
     private String POST(Request request){
@@ -217,7 +239,7 @@ public class CameraServiceImpl implements CameraService {
         CameraUser user = getAccessToken(customerId);
         String accessToken = new String();
         if (user == null) {
-            ret.put("code","404");
+            ret.put("status","404");
             ret.put("msg","未注册");
             return ret;
         }
@@ -238,9 +260,9 @@ public class CameraServiceImpl implements CameraService {
         if(null != result){
             JSONObject resultJson = JSONObject.parseObject(result);
             ret.put("data",resultJson.getJSONArray("data"));
-            ret.put("code","200");
+            ret.put("status","200");
         }else{
-            ret.put("code","500");
+            ret.put("status","500");
             ret.put("data","内部错误");
         }
         return ret;
@@ -289,7 +311,7 @@ public class CameraServiceImpl implements CameraService {
         CameraUser user = getAccessToken(customerId);
         String accessToken = new String();
         if (user == null) {
-            ret.put("code","404");
+            ret.put("status","404");
             ret.put("msg","未注册");
             return ret;
         }
@@ -309,10 +331,10 @@ public class CameraServiceImpl implements CameraService {
 
         String response = this.POST(request);
         if(null != response){
-            ret.put("code","200");
+            ret.put("status","200");
             ret.put("data",JSONObject.parseObject(response).getJSONArray("data"));
         }else{
-            ret.put("code","500");
+            ret.put("status","500");
             ret.put("data","内部错误");
         }
         return ret;
@@ -325,7 +347,7 @@ public class CameraServiceImpl implements CameraService {
         CameraUser user = getAccessToken(customerId);
         String accessToken = new String();
         if (user == null) {
-            ret.put("code","404");
+            ret.put("status","404");
             ret.put("msg","未注册");
         }
         if (!validAccessToken(user)) {
@@ -343,9 +365,10 @@ public class CameraServiceImpl implements CameraService {
 
         String response = this.POST(request);
         if(null != response){
+            ret.put("status","200");
             ret.put("data",JSONObject.parseObject(response).getJSONArray("data"));
         }else{
-            ret.put("code","500");
+            ret.put("status","500");
             ret.put("data","内部错误");
         }
         return ret;
@@ -358,8 +381,9 @@ public class CameraServiceImpl implements CameraService {
         CameraUser user = getAccessToken(customerId);
         String accessToken = new String();
         if (user == null) {
-            ret.put("code","404");
+            ret.put("status","404");
             ret.put("msg","未注册");
+            return ret;
         }
         if (!validAccessToken(user)) {
             accessToken = sendForaccessToken(customerId);
@@ -377,9 +401,9 @@ public class CameraServiceImpl implements CameraService {
         String response = this.POST(request);
         if(null != response){
             ret.put("data",JSONObject.parseObject(response).getJSONObject("data"));
-            ret.put("code","200");
+            ret.put("status","200");
         }else{
-            ret.put("code","500");
+            ret.put("status","500");
             ret.put("data","内部错误");
         }
         return ret;
@@ -501,7 +525,7 @@ public class CameraServiceImpl implements CameraService {
         CameraUser user = getAccessToken(customerId);
         String accessToken = new String();
         if (user == null) {
-            ret.put("code","404");
+            ret.put("status","404");
             ret.put("msg","未注册");
         }
         if (!validAccessToken(user)) {
@@ -519,9 +543,9 @@ public class CameraServiceImpl implements CameraService {
         String response = this.POST(request);
         if(null != response){
             ret.put("data",JSONObject.parseObject(response).getJSONArray("data"));
-            ret.put("code","200");
+            ret.put("status","200");
         }else{
-            ret.put("code","500");
+            ret.put("status","500");
             ret.put("data","内部错误");
         }
         return ret;
@@ -537,6 +561,7 @@ public class CameraServiceImpl implements CameraService {
         if (user == null) {
             ret.put("status","404");
             ret.put("msg","未注册");
+            return ret;
         }
         if (!validAccessToken(user)) {
             accessToken = sendForaccessToken(customerId);

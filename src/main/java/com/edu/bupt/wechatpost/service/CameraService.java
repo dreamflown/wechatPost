@@ -11,7 +11,7 @@ public interface CameraService {
 
     boolean validAccessToken(CameraUser user);
     CameraUser getAccessToken(Integer customerId);
-    String updateUserInfo(CameraUser user);
+    JSONObject updateUserInfo(JSONObject userInfo);
     String sendForaccessToken(Integer customerId);
     String sendForaccessToken(Integer customerId,String appKey,String appSecret);
     JSONObject register(JSONObject userJson);
