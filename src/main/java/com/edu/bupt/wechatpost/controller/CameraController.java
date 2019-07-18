@@ -211,11 +211,17 @@ public class CameraController {
     }
 
     /**
-     * 用户注册 测试完成
-     * @param data
+     * 使用序列号获取设备信息
+     * @param serial
      * @return
      * @throws Exception
      */
+    @RequestMapping(value = "/getDeviceBySerial",method =  RequestMethod.GET)
+    public  JSONObject getDeviceBySerial(@RequestParam("customerId")Integer customerId,
+                                         @RequestParam("serial")String serial){
+
+        return cameraService.getDeviceBySerial(customerId,serial);
+    }
 
     /**
      * 修改报警参数设置
